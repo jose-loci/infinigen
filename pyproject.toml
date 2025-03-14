@@ -35,6 +35,7 @@ dependencies = [
     "shapely",
     "tqdm",
     "trimesh",
+    "openai",
     "OpenEXR",
 
     "submitit", # can be removed so long as you dont use slurm.gin or --slurm args
