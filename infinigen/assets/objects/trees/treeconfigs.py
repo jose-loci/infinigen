@@ -5,6 +5,7 @@
 
 
 import bpy
+import gin
 import numpy as np
 
 from .tree import TreeParams
@@ -1048,6 +1049,10 @@ def generate_tree_config(tree_genome=None, season="autumn"):
     if tree_genome is None:
         tree_genome = np.random.rand(32)
 
+    print("-------------")
+    print("Genome", tree_genome)
+    print("-------------")
+
     cfg = parse_genome(tree_genome)
     sz = calc_height(cfg["size"], min_ht=12)
     n_tree_pts = int(sz)
@@ -1152,45 +1157,96 @@ def generate_tree_config(tree_genome=None, season="autumn"):
         twig_density = 0.5 + 0.5 * cfg["twig_density"]
         twig_inst = np.random.randint(1, 3)
 
-    return TreeParams(
-        skeleton=tree_config,
-        skinning={"Max radius": max_radius, "Min radius": 0.02, "Exponent": merge_size},
-        trunk_spacecol={
-            "atts": tmp_att_fn,
-            "D": tmp_D,
-            "s": tmp_s,
-            "d": 10,
-            "pull_dir": [0, 0, np.random.randn() * 0.3],
-            "n_steps": n_updates,
-        },
-        roots_spacecol=None,  # {'atts': None, 'D': .05, 's': .1, 'd': 2, 'dir_rand': .05, 'mag_rand': .05, 'pull_dir': None, 'n_steps': 30},
-        child_placement={
-            "depth_range": (0, 5.0),
-            "Density": twig_density,
-            "Multi inst": twig_inst,
-            "Pitch variance": 1.0,
-            "Yaw variance": 10.0,
-            "Min scale": 1.1,
-            "Max scale": 1.3,
-        },
+    return (
+        TreeParams(
+            skeleton=tree_config,
+            skinning={
+                "Max radius": max_radius,
+                "Min radius": 0.02,
+                "Exponent": merge_size,
+            },
+            trunk_spacecol={
+                "atts": tmp_att_fn,
+                "D": tmp_D,
+                "s": tmp_s,
+                "d": 10,
+                "pull_dir": [0, 0, np.random.randn() * 0.3],
+                "n_steps": n_updates,
+            },
+            roots_spacecol=None,  # {'atts': None, 'D': .05, 's': .1, 'd': 2, 'dir_rand': .05, 'mag_rand': .05, 'pull_dir': None, 'n_steps': 30},
+            child_placement={
+                "depth_range": (0, 5.0),
+                "Density": twig_density,
+                "Multi inst": twig_inst,
+                "Pitch variance": 1.0,
+                "Yaw variance": 10.0,
+                "Min scale": 1.1,
+                "Max scale": 1.3,
+            },
+        ),
+        tree_genome,
     )
 
 
-def random_tree(tree_genome=None, season="autumn"):
-    leaf_kargs = {
-        "leaf_width": np.random.rand() * 0.5 + 0.1,
-        "alpha": np.random.rand() * 0.3,
-    }
+def random_tree(
+    tree_genome=None,
+    season="autumn",
+    leaf_density=None,
+    leaf_width=None,
+    leaf_alpha=None,
+):
+    if tree_genome:
+        tree_genome_values = list(tree_genome.values())
+        tree_genome = []
+        for v in tree_genome_values:
+            if v is None:
+                v = np.random.rand()
+            tree_genome.append(v)
 
-    if season == "winter":
-        leaf_density = np.random.uniform(0.0, 0.1)
+    if leaf_width is None:
+        leaf_width = np.random.rand() * 0.5 + 0.1
+    if leaf_alpha is None:
+        leaf_alpha = np.random.rand() * 0.3
+
+    leaf_kargs = {"leaf_width": leaf_width, "alpha": leaf_alpha}
+
+    if not leaf_density:
+        if season == "winter":
+            leaf_density = np.random.uniform(0.0, 0.1)
+        elif season == "spring":  # flowers should be less dense
+            leaf_density = np.random.uniform(0.3, 0.7)
+        else:
+            leaf_density = np.random.uniform(0.4, 1.0)
+
+    if 0.0 <= leaf_density < 0.1:
         leaf_inst = 1
-    elif season == "spring":  # flowers should be less dense
-        leaf_density = np.random.uniform(0.3, 0.7)
+    elif 0.3 <= leaf_density < 0.7:
         leaf_inst = 2
     else:
-        leaf_density = np.random.uniform(0.4, 1.0)
         leaf_inst = 3
+
+    print("-------------")
+    print("Season", season)
+    print("leaf_density", leaf_density)
+    print("leaf_inst", leaf_inst)
+    print("leaf_kargs", leaf_kargs)
+    params = {
+        "season": season,
+        "leaf_density": leaf_density,
+        "leaf_inst": leaf_inst,
+        "leaf_kargs": leaf_kargs,
+    }
+    print("-------------")
+
+    # if season == "winter":
+    #     leaf_density = np.random.uniform(0.0, 0.1)
+    #     leaf_inst = 1
+    # elif season == "spring":  # flowers should be less dense
+    #     leaf_density = np.random.uniform(0.3, 0.7)
+    #     leaf_inst = 2
+    # else:
+    #     leaf_density = np.random.uniform(0.4, 1.0)
+    #     leaf_inst = 3
 
     twig_kargs = TreeParams(
         skeleton=generate_twig_config(),
@@ -1204,8 +1260,8 @@ def random_tree(tree_genome=None, season="autumn"):
             "Max scale": 0.4,
         },
     )
-    tree_kargs = generate_tree_config(tree_genome, season=season)
-    return tree_kargs, twig_kargs, leaf_kargs
+    tree_kargs, tree_genome = generate_tree_config(tree_genome, season=season)
+    return (tree_kargs, twig_kargs, leaf_kargs), params, tree_genome
 
 
 def generate_coral_config(tree_genome=None):

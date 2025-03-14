@@ -1,0 +1,24 @@
+TreeFactory.seed = 0
+TreeFactory.season = "spring"
+TreeFactory.fruit_chance = 0.0
+TreeFactory.fruit_weights = {"apple": 0.0, "blackberry": 0.0, "coconutgreen": 0.0, "durian": 0.0, "starfruit": 0.0, "strawberry": 0.0, "compositional_fruit": 0.0}
+TreeFactory.leaf_density = 0.5
+TreeFactory.leaf_alpha = 0.3
+TreeFactory.leaf_width = 0.35
+TreeFactory.tree_species_code = {
+        "tree_size_or_age": 0.8,
+        "trunk_warp": 0.6,
+        "n_trunks": 0.2,  # Increased from 0.9
+        "branch_start": 0.8,
+        "branch_angle": 0.5, # Increased from 0.2
+        "multi_branch": 0.6,
+        "branch_density": 0.2, # decreased from 0.9
+        "branch_len": 0.5,
+        "branch_warp": 0.4,
+        "pull_dir_vt": 0.7,
+        "pull_dir_hz": 0.5,
+        "outgrowth": 0.6,
+        "branch_thickness": 0.7,
+        "twig_density": 0.4, # decreased from 0.7
+        "twig_scale": 0.3,
+}
