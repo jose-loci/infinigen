@@ -3,8 +3,6 @@ import numpy as np
 from infinigen.assets.objects.trees.generate import TreeFactory
 from openai import OpenAI
 from infinigen.core import init, surface
-from infinigen.core.addon_utils import get_tree, change_config, default_config
-import json
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 if OPENAI_API_KEY:
