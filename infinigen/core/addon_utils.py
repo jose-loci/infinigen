@@ -40,7 +40,7 @@ def init_surface():
 
 def run_mvp_function():
     init_surface()
-    tree = get_tree()
+    tree = get_tree(seed=0)
     return tree
 
 system_prompt = """You are a helpful assistant that modifies a list of dictionaries representing two trees.
