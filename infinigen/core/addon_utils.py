@@ -17,7 +17,8 @@ def get_tree(**kwargs):
         "location", (np.random.uniform(-10, 10), np.random.uniform(-10, 10))
     )
     x, y = location
-    del kwargs["location"]
+    if "location" in kwargs:
+        del kwargs["location"]
 
     print(kwargs)
 
